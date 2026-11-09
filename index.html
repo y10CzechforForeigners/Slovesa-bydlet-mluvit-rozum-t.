@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Czech Verbs Conjugation - Year 10</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+            --accent: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .level-badge {
+            background-color: #e0e7ff;
+            color: var(--primary);
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .score-board {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background-color: #f1f5f9;
+            color: var(--text-light);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .task-card {
+            display: block;
+        }
+
+        .task-card.hidden {
+            display: none;
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .instruction small {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: normal;
+            margin-top: 2px;
+        }
+
+        .prompt-box {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
+        }
+
+        .fill-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .fill-input:focus {
+            border-color: var(--primary);
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            min-height: 45px;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .word-chip {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .word-chip.used {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .drop-zone {
+            min-height: 50px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Reference Table Styling */
+        .cheatsheet {
+            display: none;
+        }
+
+        .cheatsheet.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .ending {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        /* Completion Screen */
+        .completion-screen {
+            text-align: center;
+            display: none;
+            padding: 20px 0;
+        }
+
+        .completion-screen h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .completion-screen p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Čeština pro cizince (Y10)</h1>
+        <p class="subtitle">Procvičování sloves: <b>bydlet</b>, <b>mluvit</b>, <b>rozumět</b></p>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-practice" onclick="switchTab('practice')">🎮 Cvičení</button>
+            <button class="tab-btn" id="tab-cheat" onclick="switchTab('cheat')">📖 Přehled (Cheat Sheet)</button>
+        </div>
+
+        <!-- CHEAT SHEET SECTION -->
+        <div id="cheatsheet-section" class="cheatsheet">
+            <h3>Přehled časování sloves</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Zájmeno</th>
+                        <th>Bydlet (to live)</th>
+                        <th>Mluvit (to speak)</th>
+                        <th>Rozumět (to understand)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><b>Já</b></td><td>bydl<span class="ending">ím</span></td><td>mluv<span class="ending">ím</span></td><td>rozum<span class="ending">ím</span></td></tr>
+                    <tr><td><b>Ty</b></td><td>bydl<span class="ending">íš</span></td><td>mluv<span class="ending">íš</span></td><td>rozum<span class="ending">íš</span></td></tr>
+                    <tr><td><b>On/Ona/To</b></td><td>bydl<span class="ending">í</span></td><td>mluv<span class="ending">í</span></td><td>rozum<span class="ending">í</span></td></tr>
+                    <tr><td><b>My</b></td><td>bydl<span class="ending">íme</span></td><td>mluv<span class="ending">íme</span></td><td>rozum<span class="ending">íme</span></td></tr>
+                    <tr><td><b>Vy</b></td><td>bydl<span class="ending">íte</span></td><td>mluv<span class="ending">íte</span></td><td>rozum<span class="ending">íte</span></td></tr>
+                    <tr><td><b>Oni</b></td><td>bydl<span class="ending">í</span></td><td>mluv<span class="ending">í</span></td><td>rozum<span class="ending">ějí / í</span></td></tr>
+                </tbody>
+            </table>
+            <br>
+            <p><b>Zápor (Negative):</b> Přidejte <b>ne-</b> na začátek (např. <i>nemluvím, nebydlí, nerozumíme</i>).</p>
+        </div>
+
+        <!-- PRACTICE SECTION -->
+        <div id="practice-section">
+            <div class="top-bar">
+                <span class="level-badge" id="level-badge">Úroveň 1/4: Výběr</span>
+                <span class="score-board">Skóre: <span id="score">0</span> / <span id="total-questions">12</span></span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div id="exercise-card" class="task-card">
+                <div class="instruction" id="instruction-text">Vyber správný tvar slovesa.</div>
+                <div class="prompt-box" id="prompt-text">Loading question...</div>
+
+                <div id="mc-options" class="options-grid"></div>
+
+                <div id="fill-container" style="display: none;">
+                    <input type="text" id="fill-input" class="fill-input" placeholder="Napiš odpověď..." autocomplete="off">
+                    <button class="action-btn" onclick="checkFillAnswer()">Zkontrolovat</button>
+                </div>
+
+                <div id="order-container" style="display: none;">
+                    <div class="drop-zone" id="drop-zone"></div>
+                    <div class="word-bank" id="word-bank"></div>
+                    <button class="action-btn" onclick="checkOrderAnswer()">Zkontrolovat větu</button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div id="completion-screen" class="completion-screen">
+                <h2>🎉 Výborně! 🎉</h2>
+                <p>Dokončil/a jsi všechna cvičení na časování sloves!</p>
+                <p style="font-size: 1.2rem; font-weight: bold; color: var(--text);">Finální skóre: <span id="final-score"></span></p>
+                <br>
+                <button class="action-btn" onclick="restartApp()">Zkusit znovu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // Level 1: Multiple Choice (Recognition)
+            { level: 1, levelName: "1/4: Výběr možností", instruction: "Vyber správný tvar slovesa (Choose correct verb form):", prompt: "Já _____ v Praze. (bydlet)", options: ["bydlím", "bydlíš", "bydlí", "bydlíme"], answer: "bydlím" },
+            { level: 1, levelName: "1/4: Výběr možností", instruction: "Vyber správný tvar slovesa:", prompt: "Oni _____ anglicky. (mluvit)", options: ["mluvím", "mluvíte", "mluví", "mluvíme"], answer: "mluví" },
+            { level: 1, levelName: "1/4: Výběr možností", instruction: "Vyber správný tvar slovesa:", prompt: "My _____ česky. (rozumět)", options: ["rozumím", "rozumí", "rozumíme", "rozumíte"], answer: "rozumíme" },
+
+            // Level 2: Fill in the Blank (Conjugation)
+            { level: 2, levelName: "2/4: Doplňování", instruction: "Doplň správný tvar slovesa v závorce (Fill in the blank):", prompt: "Ty __________ (mluvit) velmi dobře česky.", answer: "mluvíš", type: "fill" },
+            { level: 2, levelName: "2/4: Doplňování", instruction: "Doplň správný tvar slovesa v závorce:", prompt: "Ona __________ (bydlet) v Brně.", answer: "bydlí", type: "fill" },
+            { level: 2, levelName: "2/4: Doplňování", instruction: "Doplň správný tvar slovesa v závorce:", prompt: "Já __________ (rozumět) lekci.", answer: "rozumím", type: "fill" },
+
+            // Level 3: Negation (Zápor)
+            { level: 3, levelName: "3/4: Záporné tvary", instruction: "Napiš sloveso v ZÁPORU (Write verb in NEGATIVE):", prompt: "Já mluvím česky. ➔ Já __________ (mluvit) česky.", answer: "nemluvím", type: "fill" },
+            { level: 3, levelName: "3/4: Záporné tvary", instruction: "Napiš sloveso v ZÁPORU:", prompt: "My bydlíme v Londýně. ➔ My __________ (bydlet) v Londýně.", answer: "nebydlíme", type: "fill" },
+            { level: 3, levelName: "3/4: Záporné tvary", instruction: "Napiš sloveso v ZÁPORU:", prompt: "Oni rozumí nemecky. ➔ Oni __________ (rozumět) německy.", answer: "nerozumí", altAnswers: ["nerozumějí"], type: "fill" },
+
+            // Level 4: Sentence Construction (Order)
+            { level: 4, levelName: "4/4: Stavba věty", instruction: "Sestav správnou větu z nabízených slov (Build the sentence):", prompt: "Sestav větu:", words: ["Já", "nebydlím", "v", "Praze."], answer: "Já nebydlím v Praze.", type: "order" },
+            { level: 4, levelName: "4/4: Stavba věty", instruction: "Sestav správnou větu z nabízených slov:", prompt: "Sestav větu:", words: ["My", "rozumíme", "trochu", "česky."], answer: "My rozumíme trochu česky.", type: "order" },
+            { level: 4, levelName: "4/4: Stavba věty", instruction: "Sestav správnou větu z nabízených slov:", prompt: "Sestav větu:", words: ["Vy", "mluvíte", "anglicky?"], answer: "Vy mluvíte anglicky?", type: "order" }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let selectedWords = [];
+
+        document.getElementById('total-questions').innerText = questions.length;
+
+        function loadQuestion() {
+            const q = questions[currentIndex];
+            
+            // Update UI elements
+            document.getElementById('level-badge').innerText = `Úroveň ${q.levelName}`;
+            document.getElementById('instruction-text').innerText = q.instruction;
+            document.getElementById('prompt-text').innerText = q.prompt;
+            document.getElementById('progress-bar').style.width = `${(currentIndex / questions.length) * 100}%`;
+            
+            // Hide feedback
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.className = 'feedback';
+            feedbackEl.innerText = '';
+
+            // Hide containers
+            document.getElementById('mc-options').style.display = 'none';
+            document.getElementById('fill-container').style.display = 'none';
+            document.getElementById('order-container').style.display = 'none';
+
+            if (q.type === 'fill') {
+                document.getElementById('fill-container').style.display = 'block';
+                const input = document.getElementById('fill-input');
+                input.value = '';
+                input.focus();
+            } else if (q.type === 'order') {
+                document.getElementById('order-container').style.display = 'block';
+                setupOrderQuestion(q.words);
+            } else {
+                // Multiple Choice
+                const container = document.getElementById('mc-options');
+                container.style.display = 'grid';
+                container.innerHTML = '';
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => checkMCOption(opt);
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function checkMCOption(selected) {
+            const q = questions[currentIndex];
+            if (selected === q.answer) {
+                handleCorrect();
+            } else {
+                handleIncorrect(q.answer);
+            }
+        }
+
+        function checkFillAnswer() {
+            const q = questions[currentIndex];
+            const userVal = document.getElementById('fill-input').value.trim().toLowerCase();
+            const correctVal = q.answer.toLowerCase();
+            const isAltCorrect = q.altAnswers && q.altAnswers.map(a => a.toLowerCase()).includes(userVal);
+
+            if (userVal === correctVal || isAltCorrect) {
+                handleCorrect();
+            } else {
+                handleIncorrect(q.answer);
+            }
+        }
+
+        function setupOrderQuestion(words) {
+            selectedWords = [];
+            const bank = document.getElementById('word-bank');
+            const drop = document.getElementById('drop-zone');
+            bank.innerHTML = '';
+            drop.innerHTML = '';
+
+            // Shuffle words
+            const shuffled = [...words].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((w, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'word-chip';
+                chip.innerText = w;
+                chip.dataset.index = idx;
+                chip.onclick = () => {
+                    if (chip.parentElement === bank) {
+                        drop.appendChild(chip);
+                    } else {
+                        bank.appendChild(chip);
+                    }
+                };
+                bank.appendChild(chip);
+            });
+        }
+
+        function checkOrderAnswer() {
+            const q = questions[currentIndex];
+            const dropZone = document.getElementById('drop-zone');
+            const builtSentence = Array.from(dropZone.children).map(c => c.innerText).join(' ');
+
+            if (builtSentence === q.answer) {
+                handleCorrect();
+            } else {
+                handleIncorrect(q.answer);
+            }
+        }
+
+        function handleCorrect() {
+            score++;
+            document.getElementById('score').innerText = score;
+            showFeedback(true, "Výborně! (Correct!)");
+            setTimeout(nextQuestion, 1200);
+        }
+
+        function handleIncorrect(correctAnswer) {
+            showFeedback(false, `Špatně. Správná odpověď: ${correctAnswer}`);
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function showFeedback(isCorrect, text) {
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackEl.innerText = text;
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < questions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('exercise-card').style.display = 'none';
+            document.getElementById('completion-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = '100%';
+            
+            // Confetti animation
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function restartApp() {
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('score').innerText = '0';
+            document.getElementById('exercise-card').style.display = 'block';
+            document.getElementById('completion-screen').style.display = 'none';
+            loadQuestion();
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-practice').classList.toggle('active', tab === 'practice');
+            document.getElementById('tab-cheat').classList.toggle('active', tab === 'cheat');
+            
+            document.getElementById('practice-section').style.display = tab === 'practice' ? 'block' : 'none';
+            document.getElementById('cheatsheet-section').classList.toggle('active', tab === 'cheat');
+        }
+
+        // Allow pressing Enter for input fill
+        document.getElementById('fill-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkFillAnswer();
+            }
+        });
+
+        // Initialize first question
+        loadQuestion();
+    </script>
+</body>
+</html>
